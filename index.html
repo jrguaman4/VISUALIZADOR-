@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Policial – Zona 8</title>
+  <style>
+
+    /* ── RESET & ROOT ─────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --violet-800: #5b21b6;
+      --violet-700: #6d28d9;
+      --violet-600: #7c3aed;
+      --violet-500: #8b5cf6;
+      --violet-400: #a78bfa;
+      --violet-100: #ede9fe;
+      --white: #ffffff;
+      --text-main: #1e293b;
+      --muted: #64748b;
+      --border: rgba(255, 255, 255, 0.6);
+      --glass-bg: rgba(255, 255, 255, 0.55);
+      --glass-hover: rgba(255, 255, 255, 0.8);
+      --card-bg: rgba(255, 255, 255, 0.45);
+      --sidebar-w: 280px;
+      --hdr-h: 70px;
+      --radius: 24px;
+      --trans: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow: 0 10px 40px -10px rgba(139, 92, 246, 0.15);
+      --shadow-hover: 0 16px 50px -12px rgba(139, 92, 246, 0.25);
+      --shadow-inner: inset 0 2px 4px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    body {
+      font-family: 'Outfit', 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(139,92,246,0.05)"/></svg>');
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #app { display: flex; height: 100vh; position: relative; z-index: 1; }
+
+    /* ── SIDEBAR ─────────────────────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform var(--trans);
+      z-index: 100;
+      box-shadow: 10px 0 30px -10px rgba(0,0,0,0.02);
+    }
+
+    .sidebar-header { padding: 26px 24px 20px; border-bottom: 1px solid var(--border); }
+
+    .sidebar-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--violet-400), var(--violet-600));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+      color: white;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3), var(--shadow-inner);
+    }
+
+    .logo-text { line-height: 1.2; }
+    .logo-text strong { font-size: 15px; font-weight: 800; color: var(--violet-800); letter-spacing: 0.2px; display: block; }
+    .logo-text span { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+    .sidebar-subtitle {
+      font-size: 11px; color: var(--violet-600); font-weight: 600; margin-top: 8px;
+      padding-top: 8px; border-top: 1px dashed var(--border);
+    }
+
+    .nav-section-label {
+      font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+      color: var(--muted); padding: 18px 24px 8px; text-transform: uppercase;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 24px; cursor: pointer; color: var(--text-main);
+      font-size: 13.5px; font-weight: 500; transition: all var(--trans);
+      border-left: 4px solid transparent; user-select: none;
+      margin: 4px 12px; border-radius: 12px; border-left: none;
+    }
+    .nav-item:hover { background: var(--glass-bg); box-shadow: var(--shadow); transform: translateX(4px); }
+    .nav-item.active { background: var(--white); color: var(--violet-700); box-shadow: var(--shadow); font-weight: 700; }
+    .nav-item .nav-icon { font-size: 16px; width: 22px; text-align: center; }
+    .nav-item .nav-badge {
+      margin-left: auto;
+      background: var(--violet-100); color: var(--violet-700);
+      font-size: 11px; font-weight: 800; padding: 2px 8px;
+      border-radius: 20px; box-shadow: var(--shadow-inner);
+    }
+    .nav-item.active .nav-badge { background: var(--violet-600); color: white; }
+
+    /* ── SIDEBAR TOGGLE ────── */
+    #sidebar-toggle {
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--glass-bg);
+      cursor: pointer; flex-shrink: 0; transition: all var(--trans);
+      color: var(--violet-600); font-size: 18px;
+      backdrop-filter: blur(10px);
+    }
+    #sidebar-toggle:hover { background: var(--white); box-shadow: var(--shadow); transform: translateY(-2px); }
+
+    #sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; border: none; }
+
+    /* ── ACORDEÓN DEPENDENCIAS ───────────── */
+    .nav-group { overflow: visible; margin: 0 12px; }
+
+    .nav-group-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; cursor: pointer; color: var(--text-main);
+      font-size: 13.5px; font-weight: 600; transition: all var(--trans);
+      border-radius: 12px; user-select: none; background: transparent;
+    }
+    .nav-group-header:hover { background: var(--glass-bg); }
+    .nav-group-header.open { color: var(--violet-700); background: var(--white); box-shadow: var(--shadow); }
+
+    .nav-group-header .nav-icon { font-size: 16px; width: 22px; text-align: center; }
+    .nav-group-header .nav-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-group-header .nav-count { font-size: 11px; color: var(--violet-600); font-weight: 800; margin-right: 6px; background: var(--violet-100); padding: 2px 8px; border-radius: 20px;}
+
+    .nav-chevron { font-size: 10px; color: var(--muted); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); flex-shrink: 0; }
+    .nav-group-header.open .nav-chevron { transform: rotate(180deg); color: var(--violet-600); }
+
+    .nav-group-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav-group-body.open {
+      max-height: calc(100vh - 250px); overflow-y: auto; overflow-x: hidden;
+      margin-top: 4px; padding-bottom: 8px;
+    }
+    .nav-group-body::-webkit-scrollbar { width: 4px; }
+    .nav-group-body::-webkit-scrollbar-track { background: transparent; }
+    .nav-group-body::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.2); border-radius: 99px; }
+    .nav-group-body::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.4); }
+
+    .nav-sub-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px 10px 24px; cursor: pointer; color: var(--muted);
+      font-size: 12.5px; font-weight: 500; transition: all var(--trans);
+      border-radius: 10px; margin: 2px 8px; user-select: none;
+    }
+    .nav-sub-item:hover { background: rgba(255,255,255,0.4); color: var(--violet-600); transform: translateX(4px); }
+    .nav-sub-item.active { background: var(--white); color: var(--violet-700); box-shadow: 0 4px 10px rgba(0,0,0,0.03); font-weight: 700; }
+    .nav-sub-item .sub-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: all var(--trans); }
+    .nav-sub-item:hover .sub-dot { background: var(--violet-400); transform: scale(1.5); }
+    .nav-sub-item.active .sub-dot { background: var(--violet-600); transform: scale(1.5); box-shadow: 0 0 8px var(--violet-400); }
+    
+    .nav-sub-item .sub-badge {
+      margin-left: auto; background: var(--white); color: var(--violet-600);
+      font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid var(--border);
+    }
+    .nav-sub-item.active .sub-badge { background: var(--violet-100); color: var(--violet-800); border: none; }
+
+    .sidebar-footer {
+      margin-top: auto; padding: 20px 24px;
+      border-top: 1px solid var(--border); background: rgba(255,255,255,0.2);
+      font-size: 11px; color: var(--muted); line-height: 1.6; font-weight: 500;
+    }
+
+    /* ── MAIN ────────────────────────────────── */
+    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    #topbar {
+      height: var(--hdr-h); min-height: var(--hdr-h);
+      background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 32px; gap: 20px;
+      box-shadow: 0 4px 20px -10px rgba(0,0,0,0.05); z-index: 90;
+    }
+    #topbar h1 { font-size: 18px; font-weight: 800; color: var(--text-main); letter-spacing: 0.2px; flex: 1; display: flex; align-items: center; gap: 8px;}
+    #topbar h1 span { color: var(--violet-600); background: var(--violet-100); padding: 4px 12px; border-radius: 20px; font-size: 15px;}
+    .topbar-actions { display: flex; align-items: center; gap: 14px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 14px;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      border: 1px solid transparent; transition: all var(--trans);
+      font-family: 'Outfit', sans-serif;
+    }
+    .btn-gold { background: linear-gradient(135deg, var(--violet-500), var(--violet-700)); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3), var(--shadow-inner); }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), var(--shadow-inner); }
+    .btn-outline { background: var(--white); border: 1px solid var(--border); color: var(--violet-700); box-shadow: var(--shadow); }
+    .btn-outline:hover { border-color: var(--violet-400); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+    /* Chip filtro activo */
+    #filter-chip {
+      display: none; align-items: center; gap: 8px;
+      background: var(--white); border: 1px solid var(--violet-200);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 12px; font-weight: 700; color: var(--violet-700);
+      box-shadow: var(--shadow);
+    }
+    #filter-chip.show { display: flex; animation: slideIn 0.3s ease; }
+    #filter-chip button {
+      background: var(--violet-100); border: none; color: var(--violet-700);
+      cursor: pointer; font-size: 14px; line-height: 1; padding: 2px 6px; border-radius: 50%; transition: all 0.2s;
+    }
+    #filter-chip button:hover { background: var(--violet-600); color: white; }
+
+    @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+    .search-wrap { position: relative; }
+    .search-wrap input {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; color: var(--text-main); font-weight: 500;
+      font-size: 13px; padding: 10px 16px 10px 40px; outline: none;
+      width: 220px; transition: all var(--trans);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+      font-family: 'Outfit', sans-serif;
+    }
+    .search-wrap input:focus { border-color: var(--violet-400); width: 280px; box-shadow: 0 0 0 4px var(--violet-100); }
+    .search-wrap input::placeholder { color: var(--muted); font-weight: 400;}
+    .search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--violet-500); font-size: 16px; pointer-events: none;
+    }
+
+    #content { flex: 1; overflow-y: auto; padding: 32px; }
+
+    .view { display: none; animation: fadeIn 0.4s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── DASHBOARD ────────────────────────────── */
+    .dash-title {
+      font-size: 14px; font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--violet-700);
+      margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+    }
+    .dash-title::before {
+      content: '✨'; font-size: 18px;
+    }
+
+    /* KPI cards clicables */
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
+
+    .kpi-card {
+      background: var(--glass-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px 20px;
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      position: relative; overflow: hidden;
+      transition: all var(--trans); cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .kpi-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--violet-300); box-shadow: var(--shadow-hover); background: var(--glass-hover); }
+    .kpi-card.active-filter { border-color: var(--violet-500); box-shadow: 0 0 0 3px var(--violet-100), var(--shadow-hover); background: var(--white); }
+    
+    .kpi-card .kpi-hint {
+      position: absolute; bottom: 12px; right: 16px;
+      font-size: 10px; color: var(--muted); font-weight: 600;
+      background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 12px;
+    }
+    .kpi-num   { font-size: 42px; font-weight: 800; color: var(--violet-800); line-height: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.05); }
+    .kpi-label { font-size: 12px; color: var(--muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .kpi-icon  { position: absolute; right: -10px; top: -10px; font-size: 70px; opacity: 0.1; filter: grayscale(0.5); transform: rotate(15deg); transition: all 0.3s;}
+    .kpi-card:hover .kpi-icon { transform: rotate(0deg) scale(1.1); opacity: 0.2; filter: grayscale(0); }
+
+    /* Grid 2 cols */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+
+    .dash-card {
+      background: var(--glass-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+    .dash-card-title {
+      font-size: 13px; font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--violet-700);
+      margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* Filas de estadística con barra */
+    .stat-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border-bottom: 1px dashed var(--border); font-size: 13px;
+      cursor: pointer; border-radius: 12px; transition: all var(--trans);
+      background: transparent; margin-bottom: 4px;
+    }
+    .stat-row:hover { background: var(--white); transform: translateX(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.03); border-bottom-color: transparent;}
+    .stat-row.active-filter { background: var(--violet-100); border-bottom-color: transparent; }
+    .stat-row:last-child { border: none; }
+    .stat-row .label { color: var(--text-main); font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 12px; }
+    .stat-row .val   { color: var(--violet-800); font-weight: 800; font-size: 14px; background: var(--white); padding: 2px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .bar-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .bar-bg   { flex: 1; height: 8px; background: rgba(0,0,0,0.04); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
+    .bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--violet-400), var(--violet-600)); transition: width 1s cubic-bezier(.22,.68,0,1.2); box-shadow: inset 0 2px 4px rgba(255,255,255,0.4); }
+
+    /* ── TABLA GRUPOS (numérica) ────────────── */
+    .grupos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+    }
+
+    .grupo-kpi {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px;
+      display: flex; flex-direction: column; gap: 6px;
+      cursor: pointer; transition: all var(--trans);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    .grupo-kpi:hover { border-color: var(--violet-300); transform: translateY(-3px); box-shadow: var(--shadow); }
+    .grupo-kpi.active-filter { border-color: var(--violet-500); box-shadow: 0 0 0 3px var(--violet-100); }
+    .grupo-kpi .gk-num   { font-size: 32px; font-weight: 800; color: var(--violet-700); line-height: 1; }
+    .grupo-kpi .gk-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;}
+    .grupo-kpi .gk-hint  { font-size: 10px; color: var(--violet-400); font-weight: 600; margin-top: auto; }
+
+    /* Tabla grupos por dependencia */
+    .grp-tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; margin-top: 10px; }
+    .grp-tbl th {
+      padding: 12px 10px; text-align: center;
+      font-size: 10px; font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--violet-600);
+      border-bottom: 2px solid var(--border); white-space: nowrap;
+    }
+    .grp-tbl th:first-child { text-align: left; }
+    .grp-tbl td {
+      padding: 10px; border-bottom: 1px dashed rgba(0,0,0,0.05);
+      text-align: center; color: var(--text-main); font-weight: 500;
+    }
+    .grp-tbl td:first-child { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; }
+    .grp-tbl tr:hover td { background: rgba(255,255,255,0.5); }
+    .grp-tbl tr:last-child td { border: none; }
+    .grp-tbl tr.total-row td { border-top: 2px solid var(--border); color: var(--violet-800); font-weight: 800; padding-top: 14px; }
+    .grp-tbl td .cell-val { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; }
+    .grp-tbl td .cell-val.nonzero {
+      background: var(--violet-100); border-radius: 8px;
+      padding: 2px 8px; color: var(--violet-700); font-weight: 800;
+    }
+    .grp-tbl td .cell-val.zero { color: var(--muted); opacity: 0.4; }
+
+    /* ── TABLA TODAS LAS DEPENDENCIAS ──────── */
+    .all-deps-section { margin-top: 16px; }
+    .all-deps-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    /* ── TABLA PERSONAL ──────────────────── */
+    .table-wrap {
+      background: var(--glass-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+    .table-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.4);
+    }
+    .table-header-title { font-size: 15px; font-weight: 800; color: var(--violet-800); text-transform: uppercase; letter-spacing: 0.5px;}
+    .table-header-sub   { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 600;}
+    .tbl-scroll { overflow-x: auto; padding: 0 10px 10px 10px; }
+
+    table { width: 100%; border-collapse: separate; border-spacing: 0 6px; font-size: 13px; }
+    thead tr { background: transparent; }
+    thead th {
+      padding: 14px 16px; text-align: left;
+      font-size: 11px; font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted); white-space: nowrap;
+      border-bottom: 2px solid var(--border);
+    }
+    tbody tr { background: var(--white); transition: all var(--trans); box-shadow: 0 2px 8px rgba(0,0,0,0.02); border-radius: 12px;}
+    tbody tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    tbody tr td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+    tbody tr:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(139, 92, 246, 0.08); z-index: 10; position: relative;}
+    tbody td { padding: 14px 16px; color: var(--text-main); vertical-align: middle; }
+
+    /* Celda de nombres: GRADO primero */
+    .cell-grado  { font-size: 10px; font-weight: 800; color: var(--violet-500); letter-spacing: 0.8px; text-transform: uppercase; background: var(--violet-100); display: inline-block; padding: 2px 8px; border-radius: 20px;}
+    .cell-nombre { font-weight: 700; font-size: 14px; margin-top: 6px; color: var(--text-main); display: flex; align-items: center; gap: 8px;}
+    .cell-nombre::before { content: '🧑‍✈️'; font-size: 18px; }
+    .cell-cargo  { font-size: 12px; color: var(--muted); font-weight: 500;}
+    .cell-dep    { font-size: 12px; color: var(--violet-700); font-weight: 600;}
+
+    .novedad-badge {
+      display: inline-block; padding: 4px 10px; border-radius: 8px;
+      font-size: 11px; font-weight: 700;
+      background: #fef3c7; color: #d97706;
+      border: 1px solid #fde68a;
+      max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .novedad-badge.empty { opacity: 0.4; background: #f1f5f9; color: var(--muted); border-color: #e2e8f0;}
+
+    .estado-select {
+      background: var(--white); border: 2px solid var(--border);
+      border-radius: 10px; color: var(--text-main); font-size: 12px; font-weight: 700;
+      padding: 6px 12px; cursor: pointer; outline: none;
+      transition: all var(--trans); min-width: 160px;
+      font-family: 'Outfit', sans-serif;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat, repeat;
+      background-position: right .7em top 50%, 0 0;
+      background-size: .65em auto, 100%;
+    }
+    .estado-select:hover, .estado-select:focus { border-color: var(--violet-400); box-shadow: 0 0 0 3px var(--violet-100); }
+    .estado-select.PRESENTE          { color: #059669; background-color: #d1fae5; border-color: #a7f3d0; }
+    .estado-select.FRANCO            { color: #2563eb; background-color: #dbeafe; border-color: #bfdbfe; }
+    .estado-select.LICENCIA          { color: #d97706; background-color: #fef3c7; border-color: #fde68a; }
+    .estado-select.VACACIONES        { color: #7c3aed; background-color: #ede9fe; border-color: #ddd6fe; }
+    .estado-select.TRASLADO-TEMPORAL { color: #ea580c; background-color: #ffedd5; border-color: #fed7aa; }
+    .estado-select.DESCANSO-MEDICO   { color: #e11d48; background-color: #ffe4e6; border-color: #fecdd3; }
+    .estado-select.SERVICIO          { color: #0284c7; background-color: #e0f2fe; border-color: #bae6fd; }
+
+    .save-btn {
+      background: linear-gradient(135deg, var(--violet-500), var(--violet-700)); border: none; border-radius: 10px;
+      color: white; font-size: 11px; font-weight: 800;
+      padding: 8px 14px; cursor: pointer; transition: all var(--trans);
+      letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+      font-family: 'Outfit', sans-serif;
+    }
+    .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(139, 92, 246, 0.4); }
+    .save-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; background: var(--muted); }
+    .save-btn.saved { background: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+
+    .grupo-pill {
+      display: inline-block; padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 800;
+      background: var(--violet-100); color: var(--violet-700);
+      border: 1px solid var(--violet-200); white-space: nowrap;
+    }
+
+    /* ── VISTA DEPENDENCIA ─────────────────────── */
+    .dep-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
+    }
+    .dep-header-left { display: flex; align-items: center; gap: 16px; }
+    .dep-header-icon {
+      font-size: 32px; width: 64px; height: 64px;
+      background: var(--white); border: 2px solid var(--violet-100);
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; box-shadow: var(--shadow);
+    }
+    .dep-header-title { font-size: 22px; font-weight: 800; color: var(--violet-800); }
+    .dep-header-sub   { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+
+    /* KPI row de dependencia */
+    .dep-kpi-row {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .dep-kpi {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px; position: relative; overflow: hidden;
+      cursor: pointer; transition: all var(--trans); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .dep-kpi:hover { border-color: var(--violet-300); transform: translateY(-3px); box-shadow: var(--shadow); }
+    .dep-kpi.active-filter { border-color: var(--violet-500); box-shadow: 0 0 0 3px var(--violet-100); }
+    .dep-kpi .dk-num   { font-size: 28px; font-weight: 800; color: var(--violet-700); line-height: 1; margin-bottom: 6px;}
+    .dep-kpi .dk-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;}
+    .dep-kpi .dk-icon  { position: absolute; right: 12px; top: 12px; font-size: 24px; opacity: 0.15; filter: grayscale(1); }
+
+    /* Secciones de dependencia */
+    .dep-section {
+      background: var(--glass-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+      margin-bottom: 20px; backdrop-filter: blur(16px); box-shadow: var(--shadow);
+    }
+    .dep-section-title {
+      font-size: 12px; font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--violet-700); margin-bottom: 16px;
+    }
+
+    /* Novedades */
+    .dep-novedades-list { display: flex; flex-wrap: wrap; gap: 12px; }
+    .novedad-item {
+      display: flex; align-items: center; gap: 10px;
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 12px; padding: 10px 16px; font-size: 12px; max-width: 380px;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.1);
+    }
+    .novedad-item .ni-nombre { font-weight: 800; color: #b45309; white-space: nowrap; }
+    .novedad-item .ni-text   { color: #92400e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; font-weight: 500;}
+    .novedad-item .ni-dot    { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; box-shadow: 0 0 6px #fbbf24;}
+
+    /* Filtro grupos */
+    .dep-grupos-filter { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .dep-grupo-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
+      background: var(--white); color: var(--text-main);
+      font-size: 12px; font-weight: 700; cursor: pointer; transition: all var(--trans);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03); font-family: 'Outfit', sans-serif;
+    }
+    .dep-grupo-btn:hover { border-color: var(--violet-300); color: var(--violet-700); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.1); }
+    .dep-grupo-btn.active { background: var(--violet-600); color: white; border-color: var(--violet-600); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+    .dep-grupo-btn .dg-count {
+      background: var(--violet-100); color: var(--violet-700); border-radius: 20px;
+      padding: 2px 8px; font-size: 10px; font-weight: 800;
+    }
+    .dep-grupo-btn.active .dg-count { background: rgba(255,255,255,0.2); color: white; }
+
+    /* ── LOADING ─────────────────────────────── */
+    #loading-overlay {
+      position: fixed; inset: 0; background: rgba(248, 250, 252, 0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 999; gap: 16px; transition: opacity 0.5s ease;
+    }
+    #loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .loader-logo { font-size: 50px; margin-bottom: 8px; animation: bounce 2s infinite cubic-bezier(0.28, 0.84, 0.42, 1); }
+    .loader-text { font-size: 14px; color: var(--violet-700); font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
+    .loader-bar  { width: 200px; height: 6px; background: rgba(139, 92, 246, 0.1); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);}
+    .loader-fill { height: 100%; background: linear-gradient(90deg, var(--violet-400), var(--violet-600)); border-radius: 99px; animation: load 1.5s ease-in-out infinite; }
+
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px) scale(1.05); } }
+    @keyframes load  { 0%{width:0;margin-left:0} 50%{width:100%;margin-left:0} 100%{width:0;margin-left:100%} }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px 24px; font-size: 14px; font-weight: 600; color: var(--text-main);
+      z-index: 500; transform: translateY(50px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      display: flex; align-items: center; gap: 12px;
+      min-width: 250px; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.ok  { border-left: 6px solid #10b981; }
+    #toast.ok .ti { color: #10b981; font-size: 20px;}
+    #toast.err { border-left: 6px solid #ef4444; }
+    #toast.err .ti { color: #ef4444; font-size: 20px;}
+
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .empty-state .ei { font-size: 60px; margin-bottom: 16px; opacity: 0.5; filter: grayscale(1); }
+    .empty-state div { font-weight: 600; font-size: 16px;}
+
+    ::-webkit-scrollbar       { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 99px; border: 2px solid #f8fafc;}
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.6); }
+
+    @media (max-width: 900px) {
+      #sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); box-shadow: 0 0 50px rgba(0,0,0,0.2); }
+      .dash-grid { grid-template-columns: 1fr; }
+      #topbar { padding: 0 20px; }
+      .search-wrap input { width: 160px; }
+      .search-wrap input:focus { width: 200px; }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div id="loading-overlay">
+    <img src="https://cdn.brandfetch.io/idBMnLXNaD/w/268/h/267/theme/light/logo.png?c=1dxbfHSJFAPEGdCLU4o5B"
+      alt="Escudo Policía Nacional del Ecuador" style="width: 80px; height: auto; display: block;">
+    <strong style="color:var(--gold-400);letter-spacing:1px;font-size:15px;">PERSONAL POLICIAL</strong>
+    <div class="loader-text">Cargando datos ZONA 8…</div>
+    <div class="loader-bar">
+      <div class="loader-fill"></div>
+    </div>
+  </div>
+
+  <div id="toast"><span class="ti">✔</span><span id="toast-msg">OK</span></div>
+
+  <div id="app">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="https://cdn.brandfetch.io/idBMnLXNaD/w/268/h/267/theme/light/logo.png?c=1dxbfHSJFAPEGdCLU4o5B"
+            alt="Escudo Policía Nacional del Ecuador" style="width: 80px; height: auto; display: block;">
+          <div class="logo-text">
+            <strong>POLICÍA NACIONAL</strong>
+            <span>Talento Humano Zona 8</span>
+          </div>
+        </div>
+        <div class="sidebar-subtitle">PARTE DIARIOl</div>
+      </div>
+
+      <div class="nav-section-label">Módulos</div>
+      <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard',this)">
+        <span class="nav-icon">📊</span><span>VISUALIZADOR</span>
+      </div>
+
+      <div class="nav-group" id="nav-group-deps">
+        <div class="nav-group-header open" id="nav-group-deps-header" onclick="toggleNavGroup()">
+          <span class="nav-icon">&#127962;</span>
+          <span class="nav-label">Dependencias</span>
+          <span class="nav-count" id="nav-dep-count">0</span>
+          <span class="nav-chevron">&#9660;</span>
+        </div>
+        <div class="nav-group-body open" id="nav-group-deps-body">
+          <div id="dep-nav"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div>Última actualización:</div>
+        <div id="last-update" style="color:var(--gold-300);font-weight:600;">—</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div id="main">
+      <header id="topbar">
+        <button id="sidebar-toggle" onclick="toggleSidebar()" title="Mostrar/Ocultar menú">&#9776;</button>
+        <h1><span>Personal Policial</span> — Zona 8</h1>
+        <div class="topbar-actions">
+          <div id="filter-chip">
+            <span id="filter-chip-label">Filtrando</span>
+            <button onclick="clearFilter()" title="Limpiar filtro">✕</button>
+          </div>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Buscar nombre, cédula…" oninput="filterTable()">
+          </div>
+          <button class="btn btn-outline" onclick="loadData()">↻ Actualizar</button>
+        </div>
+      </header>
+
+      <div id="content">
+
+        <!-- ── DASHBOARD ─────────────────────── -->
+        <div id="view-dashboard" class="view active">
+
+          <div class="dash-title">📊 Dashboard · Resumen General</div>
+
+          <!-- KPI totales — clicables -->
+          <div class="kpi-row" id="kpi-row">
+            <div class="kpi-card" id="kpi-card-total" onclick="filterByEstado(null)">
+              <div class="kpi-icon">👥</div>
+              <div class="kpi-num" id="kpi-total">—</div>
+              <div class="kpi-label">Total Personal</div>
+              <div class="kpi-hint">Ver todos</div>
+            </div>
+            <div class="kpi-card" id="kpi-card-PRESENTE" onclick="filterByEstado('PRESENTE')">
+              <div class="kpi-icon">✅</div>
+              <div class="kpi-num" id="kpi-presente">—</div>
+              <div class="kpi-label">Presentes</div>
+              <div class="kpi-hint">Click para filtrar</div>
+            </div>
+            <div class="kpi-card" id="kpi-card-FRANCO" onclick="filterByEstado('FRANCO')">
+              <div class="kpi-icon">🏠</div>
+              <div class="kpi-num" id="kpi-franco">—</div>
+              <div class="kpi-label">Franco</div>
+              <div class="kpi-hint">Click para filtrar</div>
+            </div>
+            <div class="kpi-card" id="kpi-card-SERVICIO" onclick="filterByEstado('SERVICIO')">
+              <div class="kpi-icon">⚙️</div>
+              <div class="kpi-num" id="kpi-servicio">—</div>
+              <div class="kpi-label">Servicio</div>
+              <div class="kpi-hint">Click para filtrar</div>
+            </div>
+            <div class="kpi-card" id="kpi-card-LICENCIA" onclick="filterByEstado('LICENCIA')">
+              <div class="kpi-icon">📄</div>
+              <div class="kpi-num" id="kpi-licencia">—</div>
+              <div class="kpi-label">Licencia</div>
+              <div class="kpi-hint">Click para filtrar</div>
+            </div>
+            <div class="kpi-card" id="kpi-card-VACACIONES" onclick="filterByEstado('VACACIONES')">
+              <div class="kpi-icon">🏖️</div>
+              <div class="kpi-num" id="kpi-vacaciones">—</div>
+              <div class="kpi-label">Vacaciones</div>
+              <div class="kpi-hint">Click para filtrar</div>
+            </div>
+            <div class="kpi-card" id="kpi-card-TRASLADO TEMPORAL" onclick="filterByEstado('TRASLADO TEMPORAL')">
+              <div class="kpi-icon">🔄</div>
+              <div class="kpi-num" id="kpi-traslado">—</div>
+              <div class="kpi-label">Tral. Temporal</div>
+              <div class="kpi-hint">Click para filtrar</div>
+            </div>
+            <div class="kpi-card" id="kpi-card-DESCANSO MEDICO" onclick="filterByEstado('DESCANSO MEDICO')">
+              <div class="kpi-icon">🏥</div>
+              <div class="kpi-num" id="kpi-descanso">—</div>
+              <div class="kpi-label">Desc. Médico</div>
+              <div class="kpi-hint">Click para filtrar</div>
+            </div>
+          </div>
+
+          <!-- Grid: dependencias + estados -->
+          <div class="dash-grid">
+            <div class="dash-card">
+              <div class="dash-card-title">
+                👮 Personal por Dependencia
+                <span style="font-size:9px;color:var(--muted);font-weight:400;letter-spacing:0;">Click = filtrar</span>
+              </div>
+              <div id="dep-stats"></div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-title">
+                📋 Distribución de Estados
+                <span style="font-size:9px;color:var(--muted);font-weight:400;letter-spacing:0;">Click = filtrar</span>
+              </div>
+              <div id="estado-stats"></div>
+            </div>
+          </div>
+
+          <!-- Tabla numérica por grupos -->
+          <div class="dash-card" style="margin-bottom:26px;">
+            <div class="dash-card-title">
+              🏷️ Personal por Grupo — Detalle Numérico
+            </div>
+            <!-- KPI cards de grupo (filtrables) -->
+            <div class="grupos-grid" id="grupo-kpi-row" style="margin-bottom:16px;"></div>
+            <!-- Tabla cruzada grupo x dependencia -->
+            <div style="overflow-x:auto;">
+              <table class="grp-tbl" id="grupo-tabla"></table>
+            </div>
+          </div>
+
+          <!-- Tabla TODAS las dependencias -->
+          <div class="all-deps-section">
+            <div class="all-deps-header">
+              <div class="dash-title" style="margin-bottom:0;">📋 Todo el Personal — Todas las Dependencias</div>
+            </div>
+            <div class="table-wrap">
+              <div class="table-header">
+                <div>
+                  <div class="table-header-title" id="all-table-title">Todos los Efectivos</div>
+                  <div class="table-header-sub" id="all-table-sub">Cargando…</div>
+                </div>
+              </div>
+              <div class="tbl-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Grado / Nombres</th>
+                      <th>Dependencia</th>
+                      <th>Cargo / Función</th>
+                      <th>Novedades / Alertas</th>
+                      <th>Grupo</th>
+                      <th>Estado</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-all"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /view-dashboard -->
+
+        <!-- ── VISTA DEPENDENCIA ──────────────── -->
+        <div id="view-personal" class="view">
+
+          <!-- Encabezado de dependencia -->
+          <div class="dep-header">
+            <div class="dep-header-left">
+              <div class="dep-header-icon">&#127962;</div>
+              <div>
+                <div class="dep-header-title" id="table-dep-title">—</div>
+                <div class="dep-header-sub" id="table-dep-sub">Personal registrado</div>
+              </div>
+            </div>
+            <button class="btn btn-outline"
+              onclick="switchView('dashboard', document.querySelector('[data-view=dashboard]'))">&#8592;
+              Dashboard</button>
+          </div>
+
+          <!-- KPIs de la dependencia -->
+          <div class="dep-kpi-row" id="dep-kpi-row"></div>
+
+          <!-- Novedades de la dependencia -->
+          <div id="dep-novedades-section" class="dep-section" style="display:none">
+            <div class="dep-section-title">&#128276; Novedades / Alertas activas</div>
+            <div id="dep-novedades-list" class="dep-novedades-list"></div>
+          </div>
+
+          <!-- Filtro por grupos -->
+          <div id="dep-grupos-section" class="dep-section">
+            <div class="dep-section-title">&#127991; Filtrar por Grupo</div>
+            <div id="dep-grupos-filter" class="dep-grupos-filter"></div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="table-wrap">
+            <div class="table-header">
+              <div>
+                <div class="table-header-title" id="dep-table-filter-title">Todos los efectivos</div>
+                <div class="table-header-sub" id="dep-table-filter-sub">—</div>
+              </div>
+            </div>
+            <div class="tbl-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Grado / Nombres</th>
+                    <th>Dependencia</th>
+                    <th>Cargo / Funcion</th>
+                    <th>Novedades / Alertas</th>
+                    <th>Grupo</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /app -->
+
+  <script>
+    // ══════════════════════════════════════
+    //  ESTADO GLOBAL
+    // ══════════════════════════════════════
+    var ALL_DATA = [];
+    var DASH_DATA = {};
+    var CURRENT_DEP = null;
+    var ACTIVE_FILTER_ESTADO = null;
+    var ACTIVE_FILTER_DEP = null;
+    var ACTIVE_FILTER_GRUPO = null;
+
+    var STATES = ["LICENCIA", "FRANCO", "PRESENTE", "VACACIONES", "TRASLADO TEMPORAL", "DESCANSO MEDICO", "SERVICIO"];
+
+    // ══════════════════════════════════════
+    //  INIT
+    // ══════════════════════════════════════
+    function init() { loadData(); }
+
+    function parseCSV(text) {
+      var lines = [];
+      var row = [];
+      var val = "";
+      var inQuote = false;
+      for (var i = 0; i < text.length; i++) {
+        var c = text[i];
+        var n = text[i + 1];
+        if (inQuote) {
+          if (c === '"') {
+            if (n === '"') { val += '"'; i++; }
+            else { inQuote = false; }
+          } else {
+            val += c;
+          }
+        } else {
+          if (c === '"') {
+            inQuote = true;
+          } else if (c === ',') {
+            row.push(val); val = "";
+          } else if (c === '\n' || c === '\r') {
+            row.push(val); lines.push(row);
+            row = []; val = "";
+            if (c === '\r' && n === '\n') i++;
+          } else {
+            val += c;
+          }
+        }
+      }
+      if (row.length || val) { row.push(val); lines.push(row); }
+      return lines;
+    }
+
+    function loadData() {
+      showLoading(true);
+      fetch('datos.csv')
+        .then(r => r.arrayBuffer())
+        .then(buf => {
+          var text = new TextDecoder('iso-8859-1').decode(buf);
+          var csvLines = parseCSV(text);
+          ALL_DATA = [];
+          if (csvLines.length > 1) {
+            for (var i = 1; i < csvLines.length; i++) {
+              var r = csvLines[i];
+              if (r.length < 8 || !r[0]) continue;
+              ALL_DATA.push({
+                fila: i + 1,
+                cedula: r[0] ? r[0].trim() : "",
+                grado: r[1] ? r[1].trim() : "",
+                nombres: r[2] ? r[2].trim() : "",
+                dependencia: r[3] ? r[3].trim() : "",
+                cargo: r[4] ? r[4].trim() : "",
+                novedades: r[5] ? r[5].trim() : "",
+                grupo: r[6] ? r[6].trim() : "",
+                estado: r[7] ? r[7].trim().toUpperCase() : "",
+                celular: r[8] ? r[8].trim() : ""
+              });
+            }
+          }
+          buildSidebarDeps();
+          loadDashboard();
+        })
+        .catch(err => {
+          showLoading(false);
+          toast("Error al cargar: " + err.message, false);
+        });
+    }
+
+    function generateDashboardData() {
+      var rows = ALL_DATA;
+      var depMap = {};
+      var estadoTot = {};
+      var grupoTot = {};
+      var total = rows.length;
+
+      rows.forEach(function (r) {
+        var dep = r.dependencia || "SIN DEPENDENCIA";
+        var est = r.estado || "SIN ESTADO";
+        var grp = r.grupo || "SIN GRUPO";
+
+        if (!depMap[dep]) depMap[dep] = { total: 0, estados: {} };
+        depMap[dep].total++;
+        depMap[dep].estados[est] = (depMap[dep].estados[est] || 0) + 1;
+
+        estadoTot[est] = (estadoTot[est] || 0) + 1;
+        grupoTot[grp] = (grupoTot[grp] || 0) + 1;
+      });
+
+      return {
+        ok: true,
+        total: total,
+        depMap: depMap,
+        estadoTot: estadoTot,
+        grupoTot: grupoTot
+      };
+    }
+
+    function loadDashboard() {
+      try {
+        var res = generateDashboardData();
+        DASH_DATA = res;
+        renderDashboard(res);
+        renderAllDepsTable(ALL_DATA);
+        showLoading(false);
+        updateTimestamp();
+      } catch (err) {
+        showLoading(false);
+        toast("Error dashboard: " + err.message, false);
+      }
+    }
+
+    // ══════════════════════════════════════
+    //  SIDEBAR — hamburguesa + acordeón
+    // ══════════════════════════════════════
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("collapsed");
+    }
+
+    function toggleNavGroup() {
+      var header = document.getElementById("nav-group-deps-header");
+      var body = document.getElementById("nav-group-deps-body");
+      var open = body.classList.contains("open");
+      if (open) {
+        body.classList.remove("open");
+        header.classList.remove("open");
+      } else {
+        body.classList.add("open");
+        header.classList.add("open");
+      }
+    }
+
+    function buildSidebarDeps() {
+      var depCounts = {};
+      ALL_DATA.forEach(function (r) {
+        var d = r.dependencia || "SIN DEPENDENCIA";
+        depCounts[d] = (depCounts[d] || 0) + 1;
+      });
+      var deps = Object.keys(depCounts).sort();
+      var total = deps.reduce(function (s, d) { return s + depCounts[d]; }, 0);
+      var countEl = document.getElementById("nav-dep-count");
+      if (countEl) countEl.textContent = total;
+
+      var container = document.getElementById("dep-nav");
+      container.innerHTML = "";
+      deps.forEach(function (dep) {
+        var div = document.createElement("div");
+        div.className = "nav-sub-item";
+        div.setAttribute("data-dep", dep);
+        div.innerHTML =
+          '<span class="sub-dot"></span>' +
+          '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + dep + '">' + dep + '</span>' +
+          '<span class="sub-badge">' + depCounts[dep] + '</span>';
+        div.onclick = function () { switchToDep(dep, div); };
+        container.appendChild(div);
+      });
+    }
+
+    // ══════════════════════════════════════
+    //  NAVEGACIÓN
+    // ══════════════════════════════════════
+    function switchView(viewId, el) {
+      document.querySelectorAll(".nav-item, .nav-sub-item").forEach(function (n) { n.classList.remove("active"); });
+      if (el) el.classList.add("active");
+      document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("active"); });
+      var v = document.getElementById("view-" + viewId);
+      if (v) v.classList.add("active");
+      CURRENT_DEP = null;
+      document.getElementById("search-input").value = "";
+    }
+
+    function switchToDep(dep, el) {
+      CURRENT_DEP = dep;
+      DEP_ACTIVE_GRUPO = null;
+      clearFilter();
+      document.querySelectorAll(".nav-item, .nav-sub-item").forEach(function (n) { n.classList.remove("active"); });
+      if (el) el.classList.add("active");
+      document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("active"); });
+      document.getElementById("view-personal").classList.add("active");
+
+      var all = ALL_DATA.filter(function (r) { return r.dependencia === dep; });
+      document.getElementById("table-dep-title").textContent = dep;
+      document.getElementById("table-dep-sub").textContent = all.length + " efectivo(s) registrado(s)";
+      document.getElementById("search-input").value = "";
+
+      renderDepKPIs(all);
+      renderDepNovedades(all);
+      renderDepGrupos(all);
+      renderDepTable(all);
+    }
+
+    // ── KPIs de la dependencia ─────────────────────
+    function renderDepKPIs(rows) {
+      var ESTADO_CFG = [
+        { key: null, label: "Total", icon: "&#128101;", color: "var(--gold-300)" },
+        { key: "PRESENTE", label: "Presentes", icon: "&#9989;", color: "#4ade80" },
+        { key: "FRANCO", label: "Franco", icon: "&#127968;", color: "#60a5fa" },
+        { key: "SERVICIO", label: "Servicio", icon: "&#9881;", color: "var(--gold-300)" },
+        { key: "LICENCIA", label: "Licencia", icon: "&#128196;", color: "#f59e0b" },
+        { key: "VACACIONES", label: "Vacaciones", icon: "&#127958;", color: "#a78bfa" },
+        { key: "TRASLADO TEMPORAL", label: "Tral. Temp.", icon: "&#128260;", color: "#fb923c" },
+        { key: "DESCANSO MEDICO", label: "Desc. Med.", icon: "&#127973;", color: "#f87171" }
+      ];
+      var counts = { null: rows.length };
+      rows.forEach(function (r) { var e = r.estado || ""; counts[e] = (counts[e] || 0) + 1; });
+
+      var container = document.getElementById("dep-kpi-row");
+      container.innerHTML = "";
+      ESTADO_CFG.forEach(function (cfg) {
+        var cnt = cfg.key === null ? rows.length : (counts[cfg.key] || 0);
+        var div = document.createElement("div");
+        div.className = "dep-kpi" + (cfg.key === null ? "" : "");
+        div.setAttribute("data-estado", cfg.key || "");
+        div.innerHTML =
+          '<div class="dk-icon">' + cfg.icon + '</div>' +
+          '<div class="dk-num" style="color:' + cfg.color + '">' + cnt + '</div>' +
+          '<div class="dk-label">' + cfg.label + '</div>';
+        div.onclick = (function (k) { return function () { filterDepByEstado(k); }; })(cfg.key);
+        container.appendChild(div);
+      });
+    }
+
+    // ── Novedades de la dependencia ────────────────
+    function renderDepNovedades(rows) {
+      var withNov = rows.filter(function (r) { return r.novedades && String(r.novedades).trim() !== ""; });
+      var section = document.getElementById("dep-novedades-section");
+      var list = document.getElementById("dep-novedades-list");
+      if (!withNov.length) { section.style.display = "none"; return; }
+      section.style.display = "block";
+      list.innerHTML = "";
+      withNov.forEach(function (r) {
+        var div = document.createElement("div");
+        div.className = "novedad-item";
+        div.innerHTML =
+          '<span class="ni-dot"></span>' +
+          '<span class="ni-nombre">' + escHtml(r.grado ? r.grado + " " + r.nombres : r.nombres || "—") + '</span>' +
+          '<span class="ni-text">' + escHtml(r.novedades) + '</span>';
+        list.appendChild(div);
+      });
+    }
+
+    // ── Filtro por grupos ──────────────────────────
+    var DEP_ACTIVE_GRUPO = null;
+    var DEP_ACTIVE_ESTADO = null;
+
+    function renderDepGrupos(rows) {
+      var grpCounts = {};
+      // Normalizar grupo a String para evitar mismatch numérico/string
+      rows.forEach(function (r) {
+        var g = (r.grupo !== null && r.grupo !== undefined && String(r.grupo).trim() !== "")
+          ? String(r.grupo).trim() : "SIN GRUPO";
+        grpCounts[g] = (grpCounts[g] || 0) + 1;
+      });
+      var grupos = Object.keys(grpCounts).sort(function (a, b) {
+        var na = parseFloat(a), nb = parseFloat(b);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.localeCompare(b);
+      });
+
+      var container = document.getElementById("dep-grupos-filter");
+      container.innerHTML = "";
+
+      // Botón "Todos"
+      var btnTodos = document.createElement("button");
+      btnTodos.className = "dep-grupo-btn active";
+      btnTodos.id = "dep-gbtn-TODOS";
+      btnTodos.innerHTML = "Todos <span class='dg-count'>" + rows.length + "</span>";
+      btnTodos.onclick = function () { filterDepByGrupo(null); };
+      container.appendChild(btnTodos);
+
+      grupos.forEach(function (g) {
+        var btn = document.createElement("button");
+        btn.className = "dep-grupo-btn";
+        btn.id = "dep-gbtn-" + g.replace(/\s+/g, "_");
+        btn.innerHTML = "Grupo " + escHtml(g) + " <span class='dg-count'>" + grpCounts[g] + "</span>";
+        btn.onclick = (function (grp) { return function () { filterDepByGrupo(grp); }; })(g);
+        container.appendChild(btn);
+      });
+    }
+
+    function filterDepByGrupo(grupo) {
+      DEP_ACTIVE_GRUPO = grupo;
+      DEP_ACTIVE_ESTADO = null;
+
+      // Activar botón
+      document.querySelectorAll(".dep-grupo-btn").forEach(function (b) { b.classList.remove("active"); });
+      var id = grupo ? "dep-gbtn-" + grupo.replace(/\s+/g, "_") : "dep-gbtn-TODOS";
+      var btn = document.getElementById(id);
+      if (btn) btn.classList.add("active");
+
+      // Limpiar KPI activo
+      document.querySelectorAll(".dep-kpi").forEach(function (k) { k.classList.remove("active-filter"); });
+
+      var base = ALL_DATA.filter(function (r) { return r.dependencia === CURRENT_DEP; });
+      var rows = grupo
+        ? base.filter(function (r) {
+          var g = (r.grupo !== null && r.grupo !== undefined) ? String(r.grupo).trim() : "SIN GRUPO";
+          return g === grupo;
+        })
+        : base;
+
+      var label = grupo ? ("Grupo " + grupo) : "Todos los efectivos";
+      var sub = label + " — " + rows.length + " efectivo(s)";
+      document.getElementById("dep-table-filter-title").textContent = label;
+      document.getElementById("dep-table-filter-sub").textContent = sub;
+      renderTable(rows, "tbody");
+    }
+
+    function filterDepByEstado(estado) {
+      DEP_ACTIVE_ESTADO = estado;
+      DEP_ACTIVE_GRUPO = null;
+
+      // Activar KPI
+      document.querySelectorAll(".dep-kpi").forEach(function (k) { k.classList.remove("active-filter"); });
+      document.querySelectorAll(".dep-grupo-btn").forEach(function (b) { b.classList.remove("active"); });
+      var btnTodos = document.getElementById("dep-gbtn-TODOS");
+      if (btnTodos) btnTodos.classList.add("active");
+
+      var base = ALL_DATA.filter(function (r) { return r.dependencia === CURRENT_DEP; });
+      var rows = estado ? base.filter(function (r) { return r.estado === estado; }) : base;
+
+      var ICONS = { "PRESENTE": "✅", "FRANCO": "🏠", "LICENCIA": "📄", "VACACIONES": "🏖️", "TRASLADO TEMPORAL": "🔄", "DESCANSO MEDICO": "🏥", "SERVICIO": "⚙️" };
+      var label = estado ? ((ICONS[estado] || "") + " " + estado) : "Todos los efectivos";
+      document.getElementById("dep-table-filter-title").textContent = label;
+      document.getElementById("dep-table-filter-sub").textContent = rows.length + " efectivo(s)";
+
+      // Marcar KPI activo
+      var kpis = document.querySelectorAll(".dep-kpi");
+      kpis.forEach(function (k) {
+        if (k.getAttribute("data-estado") === (estado || "")) k.classList.add("active-filter");
+      });
+      renderTable(rows, "tbody");
+    }
+
+    function renderDepTable(rows) {
+      document.getElementById("dep-table-filter-title").textContent = "Todos los efectivos";
+      document.getElementById("dep-table-filter-sub").textContent = rows.length + " efectivo(s)";
+      renderTable(rows, "tbody");
+    }
+
+    // ══════════════════════════════════════
+    //  FILTROS DESDE DASHBOARD
+    // ══════════════════════════════════════
+    function filterByEstado(estado) {
+      ACTIVE_FILTER_ESTADO = estado;
+      ACTIVE_FILTER_DEP = null;
+      ACTIVE_FILTER_GRUPO = null;
+
+      // Limpiar estilos de cards
+      document.querySelectorAll(".kpi-card").forEach(function (c) { c.classList.remove("active-filter"); });
+      document.querySelectorAll(".stat-row").forEach(function (r) { r.classList.remove("active-filter"); });
+      document.querySelectorAll(".grupo-kpi").forEach(function (g) { g.classList.remove("active-filter"); });
+
+      var rows = estado ? ALL_DATA.filter(function (r) { return r.estado === estado; }) : ALL_DATA;
+      var label = estado ? "Estado: " + estado : "Todos los efectivos";
+
+      if (estado) {
+        var card = document.getElementById("kpi-card-" + estado);
+        if (card) card.classList.add("active-filter");
+      } else {
+        var cardTot = document.getElementById("kpi-card-total");
+        if (cardTot) cardTot.classList.add("active-filter");
+      }
+
+      showFilterChip(estado ? ("Estado: " + estado) : null);
+      updateAllTable(rows, label, rows.length);
+      scrollToAllTable();
+    }
+
+    function filterByDep(dep) {
+      ACTIVE_FILTER_ESTADO = null;
+      ACTIVE_FILTER_DEP = dep;
+      ACTIVE_FILTER_GRUPO = null;
+
+      document.querySelectorAll(".kpi-card").forEach(function (c) { c.classList.remove("active-filter"); });
+      document.querySelectorAll(".stat-row").forEach(function (r) { r.classList.remove("active-filter"); });
+
+      var rows = ALL_DATA.filter(function (r) { return r.dependencia === dep; });
+      showFilterChip("Dependencia: " + dep);
+      updateAllTable(rows, dep, rows.length);
+      scrollToAllTable();
+    }
+
+    function filterByGrupo(grupo) {
+      ACTIVE_FILTER_ESTADO = null;
+      ACTIVE_FILTER_DEP = null;
+      ACTIVE_FILTER_GRUPO = grupo;
+
+      document.querySelectorAll(".grupo-kpi").forEach(function (g) { g.classList.remove("active-filter"); });
+      var gEl = document.getElementById("gkpi-" + grupo.replace(/\s+/g, "_"));
+      if (gEl) gEl.classList.add("active-filter");
+
+      var rows = ALL_DATA.filter(function (r) { return r.grupo === grupo; });
+      showFilterChip("Grupo: " + grupo);
+      updateAllTable(rows, "Grupo: " + grupo, rows.length);
+      scrollToAllTable();
+    }
+
+    function clearFilter() {
+      ACTIVE_FILTER_ESTADO = null;
+      ACTIVE_FILTER_DEP = null;
+      ACTIVE_FILTER_GRUPO = null;
+      document.querySelectorAll(".kpi-card").forEach(function (c) { c.classList.remove("active-filter"); });
+      document.querySelectorAll(".stat-row").forEach(function (r) { r.classList.remove("active-filter"); });
+      document.querySelectorAll(".grupo-kpi").forEach(function (g) { g.classList.remove("active-filter"); });
+      showFilterChip(null);
+      renderAllDepsTable(ALL_DATA);
+    }
+
+    function showFilterChip(label) {
+      var chip = document.getElementById("filter-chip");
+      if (label) {
+        document.getElementById("filter-chip-label").textContent = label;
+        chip.classList.add("show");
+      } else {
+        chip.classList.remove("show");
+      }
+    }
+
+    function updateAllTable(rows, title, cnt) {
+      document.getElementById("all-table-title").textContent = title || "Todos los Efectivos";
+      document.getElementById("all-table-sub").textContent = cnt + " efectivo(s)";
+      renderTable(rows, "tbody-all");
+    }
+
+    function scrollToAllTable() {
+      var el = document.querySelector(".all-deps-section");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderAllDepsTable(rows) {
+      document.getElementById("all-table-title").textContent = "Todos los Efectivos";
+      document.getElementById("all-table-sub").textContent = rows.length + " efectivo(s) registrado(s)";
+      renderTable(rows, "tbody-all");
+    }
+
+    // ══════════════════════════════════════
+    //  RENDER TABLA (genérica)
+    // ══════════════════════════════════════
+    function renderTable(rows, tbodyId) {
+      var tbody = document.getElementById(tbodyId || "tbody");
+      tbody.innerHTML = "";
+      if (!rows || rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="ei">📭</div>Sin registros</div></td></tr>';
+        return;
+      }
+      rows.forEach(function (r, i) {
+        var estadoClass = (r.estado || "").replace(/\s+/g, "-");
+        var novedadHtml = r.novedades
+          ? '<span class="novedad-badge">' + escHtml(r.novedades) + '</span>'
+          : '<span class="novedad-badge empty">—</span>';
+        var opts = STATES.map(function (s) {
+          return '<option value="' + s + '"' + (r.estado === s ? ' selected' : '') + '>' + s + '</option>';
+        }).join("");
+
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-fila", r.fila);
+        tr.setAttribute("data-cedula", r.cedula);
+        tr.setAttribute("data-nombres", (r.nombres || "").toLowerCase());
+        // GRADO primero, luego NOMBRE
+        tr.innerHTML =
+          '<td style="color:var(--muted);font-size:11px;">' + (i + 1) + '</td>' +
+          '<td>' +
+          '<div class="cell-grado">' + escHtml(r.grado || "") + '</div>' +
+          '<div class="cell-nombre">' + escHtml(r.nombres || "—") + '</div>' +
+          '</td>' +
+          '<td><div class="cell-dep">' + escHtml(r.dependencia || "—") + '</div></td>' +
+          '<td><div class="cell-cargo">' + escHtml(r.cargo || "—") + '</div></td>' +
+          '<td>' + novedadHtml + '</td>' +
+          '<td><span class="grupo-pill">' + escHtml(r.grupo || "—") + '</span></td>' +
+          '<td>' +
+          '<select class="estado-select ' + estadoClass + '" onchange="onEstadoChange(this)" data-original="' + escAttr(r.estado) + '">' + opts + '</select>' +
+          '</td>' +
+          '<td><button class="save-btn" onclick="guardarEstado(this)" data-fila="' + r.fila + '" disabled>GUARDAR</button></td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function onEstadoChange(sel) {
+      var orig = sel.getAttribute("data-original");
+      var btn = sel.closest("tr").querySelector(".save-btn");
+      sel.className = "estado-select " + sel.value.replace(/\s+/g, "-");
+      btn.disabled = (sel.value === orig);
+      btn.className = "save-btn";
+      btn.textContent = "GUARDAR";
+    }
+
+    // ══════════════════════════════════════
+    //  GUARDAR ESTADO
+    // ══════════════════════════════════════
+    function guardarEstado(btn) {
+      var fila = parseInt(btn.getAttribute("data-fila"));
+      var tr = btn.closest("tr");
+      var sel = tr.querySelector(".estado-select");
+      var estado = sel.value;
+      btn.disabled = true; btn.textContent = "…";
+
+      // En GitHub Pages simulamos el guardado localmente
+      setTimeout(function () {
+        sel.setAttribute("data-original", estado);
+        btn.className = "save-btn saved"; btn.textContent = "✔ OK";
+        ALL_DATA.forEach(function (r) { if (r.fila === fila) r.estado = estado; });
+
+        DASH_DATA = generateDashboardData();
+        renderDashboard(DASH_DATA);
+
+        toast("Estado actualizado: " + estado, true);
+        setTimeout(function () { btn.textContent = "GUARDAR"; btn.className = "save-btn"; btn.disabled = true; }, 2200);
+      }, 400);
+    }
+
+    // ══════════════════════════════════════
+    //  BÚSQUEDA
+    // ══════════════════════════════════════
+    function filterTable() {
+      var q = document.getElementById("search-input").value.toLowerCase().trim();
+
+      if (!CURRENT_DEP) {
+        // Estamos en dashboard — filtrar tabla-all
+        var base = ALL_DATA;
+        if (ACTIVE_FILTER_ESTADO) base = base.filter(function (r) { return r.estado === ACTIVE_FILTER_ESTADO; });
+        if (ACTIVE_FILTER_DEP) base = base.filter(function (r) { return r.dependencia === ACTIVE_FILTER_DEP; });
+        if (ACTIVE_FILTER_GRUPO) base = base.filter(function (r) { return r.grupo === ACTIVE_FILTER_GRUPO; });
+        if (q.length > 0) {
+          base = base.filter(function (r) {
+            return (r.nombres || "").toLowerCase().indexOf(q) !== -1 ||
+              String(r.cedula).indexOf(q) !== -1 ||
+              (r.grado || "").toLowerCase().indexOf(q) !== -1;
+          });
+        }
+        document.getElementById("all-table-sub").textContent = base.length + " efectivo(s)";
+        renderTable(base, "tbody-all");
+        return;
+      }
+      // En vista de dependencia — respetar filtro activo
+      var base2 = ALL_DATA.filter(function (r) { return r.dependencia === CURRENT_DEP; });
+      if (DEP_ACTIVE_GRUPO) base2 = base2.filter(function (r) { return r.grupo === DEP_ACTIVE_GRUPO; });
+      if (DEP_ACTIVE_ESTADO) base2 = base2.filter(function (r) { return r.estado === DEP_ACTIVE_ESTADO; });
+      if (q.length === 0) { renderTable(base2, "tbody"); return; }
+      renderTable(base2.filter(function (r) {
+        return (r.nombres || "").toLowerCase().indexOf(q) !== -1 ||
+          (r.grado || "").toLowerCase().indexOf(q) !== -1 ||
+          String(r.cedula).indexOf(q) !== -1 ||
+          (r.cargo || "").toLowerCase().indexOf(q) !== -1;
+      }), "tbody");
+    }
+
+    // ══════════════════════════════════════
+    //  DASHBOARD
+    // ══════════════════════════════════════
+    function renderDashboard(d) {
+      // KPIs
+      setText("kpi-total", d.total || 0);
+      setText("kpi-presente", (d.estadoTot && d.estadoTot["PRESENTE"]) || 0);
+      setText("kpi-franco", (d.estadoTot && d.estadoTot["FRANCO"]) || 0);
+      setText("kpi-servicio", (d.estadoTot && d.estadoTot["SERVICIO"]) || 0);
+      setText("kpi-licencia", (d.estadoTot && d.estadoTot["LICENCIA"]) || 0);
+      setText("kpi-descanso", (d.estadoTot && d.estadoTot["DESCANSO MEDICO"]) || 0);
+      setText("kpi-vacaciones", (d.estadoTot && d.estadoTot["VACACIONES"]) || 0);
+      setText("kpi-traslado", (d.estadoTot && d.estadoTot["TRASLADO TEMPORAL"]) || 0);
+
+      // Dependencias (clicable)
+      var depEl = document.getElementById("dep-stats");
+      depEl.innerHTML = "";
+      var deps = Object.keys(d.depMap || {}).sort(function (a, b) { return d.depMap[b].total - d.depMap[a].total; });
+      var maxDep = deps.length ? d.depMap[deps[0]].total : 1;
+      deps.forEach(function (dep) {
+        var cnt = d.depMap[dep].total;
+        var pct = Math.round(cnt / maxDep * 100);
+        var row = document.createElement("div");
+        row.className = "stat-row";
+        row.setAttribute("data-dep", dep);
+        row.innerHTML =
+          '<span class="label" title="' + dep + '">' + dep + '</span>' +
+          '<div class="bar-wrap">' +
+          '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+          '<span class="val">' + cnt + '</span>' +
+          '</div>';
+        row.onclick = function () {
+          document.querySelectorAll("#dep-stats .stat-row").forEach(function (r) { r.classList.remove("active-filter"); });
+          row.classList.add("active-filter");
+          filterByDep(dep);
+        };
+        depEl.appendChild(row);
+      });
+
+      // Estados (clicable)
+      var estEl = document.getElementById("estado-stats");
+      estEl.innerHTML = "";
+      var ICONS = { "PRESENTE": "✅", "FRANCO": "🏠", "LICENCIA": "📄", "VACACIONES": "🏖️", "TRASLADO TEMPORAL": "🔄", "DESCANSO MEDICO": "🏥", "SERVICIO": "⚙️", "SIN ESTADO": "❓" };
+      var ests = Object.keys(d.estadoTot || {}).sort(function (a, b) { return d.estadoTot[b] - d.estadoTot[a]; });
+      var maxEst = ests.length ? d.estadoTot[ests[0]] : 1;
+      ests.forEach(function (est) {
+        var cnt = d.estadoTot[est];
+        var pct = Math.round(cnt / maxEst * 100);
+        var row = document.createElement("div");
+        row.className = "stat-row";
+        row.innerHTML =
+          '<span class="label">' + (ICONS[est] || "📋") + ' ' + est + '</span>' +
+          '<div class="bar-wrap">' +
+          '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+          '<span class="val">' + cnt + '</span>' +
+          '</div>';
+        row.onclick = function () {
+          document.querySelectorAll("#estado-stats .stat-row").forEach(function (r) { r.classList.remove("active-filter"); });
+          row.classList.add("active-filter");
+          filterByEstado(est);
+        };
+        estEl.appendChild(row);
+      });
+
+      // Grupos — KPI cards + tabla cruzada
+      renderGrupos(d);
+    }
+
+    // ══════════════════════════════════════
+    //  GRUPOS — KPI numérico + tabla cruzada
+    // ══════════════════════════════════════
+    function renderGrupos(d) {
+      var grupoTot = d.grupoTot || {};
+      var depMap = d.depMap || {};
+      var grupos = Object.keys(grupoTot).sort();
+      var deps = Object.keys(depMap).sort();
+      var total = d.total || 0;
+
+      // ── KPI cards por grupo (filtrables) ──
+      var kpiRow = document.getElementById("grupo-kpi-row");
+      kpiRow.innerHTML = "";
+      grupos.forEach(function (g) {
+        var div = document.createElement("div");
+        div.className = "grupo-kpi";
+        div.id = "gkpi-" + g.replace(/\s+/g, "_");
+        div.innerHTML =
+          '<div class="gk-num">' + grupoTot[g] + '</div>' +
+          '<div class="gk-label">' + g + '</div>' +
+          '<div class="gk-hint">Click para filtrar</div>';
+        div.onclick = function () { filterByGrupo(g); };
+        kpiRow.appendChild(div);
+      });
+
+      // Card TOTAL grupos
+      var totCard = document.createElement("div");
+      totCard.className = "grupo-kpi";
+      totCard.style.borderColor = "rgba(212,175,55,0.35)";
+      totCard.innerHTML =
+        '<div class="gk-num" style="color:var(--gold-200)">' + total + '</div>' +
+        '<div class="gk-label">TOTAL</div>' +
+        '<div class="gk-hint">Todos los grupos</div>';
+      totCard.onclick = function () { clearFilter(); };
+      kpiRow.appendChild(totCard);
+
+      // ── Tabla cruzada grupo × dependencia ──
+      var tbl = document.getElementById("grupo-tabla");
+      if (!grupos.length || !deps.length) { tbl.innerHTML = ""; return; }
+
+      // Calcular datos: grupoData[dep][grupo] = count
+      var grupoData = {};
+      ALL_DATA.forEach(function (r) {
+        var dep = r.dependencia || "SIN DEPENDENCIA";
+        var grp = r.grupo || "SIN GRUPO";
+        if (!grupoData[dep]) grupoData[dep] = {};
+        grupoData[dep][grp] = (grupoData[dep][grp] || 0) + 1;
+      });
+
+      var html = "<thead><tr><th>Dependencia</th>";
+      grupos.forEach(function (g) { html += "<th>" + escHtml(g) + "</th>"; });
+      html += "<th>TOTAL</th></tr></thead><tbody>";
+
+      var colTotals = {};
+      grupos.forEach(function (g) { colTotals[g] = 0; });
+      var grandTotal = 0;
+
+      deps.forEach(function (dep) {
+        var rowTotal = 0;
+        html += "<tr><td>" + escHtml(dep) + "</td>";
+        grupos.forEach(function (g) {
+          var v = (grupoData[dep] && grupoData[dep][g]) || 0;
+          colTotals[g] += v;
+          rowTotal += v;
+          html += '<td><span class="cell-val ' + (v > 0 ? "nonzero" : "zero") + '">' + v + '</span></td>';
+        });
+        grandTotal += rowTotal;
+        html += '<td><span class="cell-val nonzero">' + rowTotal + '</span></td></tr>';
+      });
+
+      // Fila totales
+      html += "<tr class='total-row'><td>TOTAL</td>";
+      grupos.forEach(function (g) {
+        html += '<td><span class="cell-val nonzero">' + colTotals[g] + '</span></td>';
+      });
+      html += '<td><span class="cell-val nonzero">' + grandTotal + '</span></td></tr>';
+      html += "</tbody>";
+      tbl.innerHTML = html;
+    }
+
+    // ══════════════════════════════════════
+    //  HELPERS
+    // ══════════════════════════════════════
+    function setText(id, val) { var e = document.getElementById(id); if (e) e.textContent = val; }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escAttr(s) { return escHtml(s || ""); }
+
+    function updateTimestamp() {
+      var n = new Date(), p = function (x) { return x < 10 ? "0" + x : x; };
+      document.getElementById("last-update").textContent =
+        p(n.getDate()) + "/" + p(n.getMonth() + 1) + "/" + n.getFullYear() + " " + p(n.getHours()) + ":" + p(n.getMinutes());
+    }
+
+    function showLoading(show) {
+      var e = document.getElementById("loading-overlay");
+      show ? e.classList.remove("hidden") : e.classList.add("hidden");
+    }
+
+    var _tt = null;
+    function toast(msg, ok) {
+      var e = document.getElementById("toast");
+      var i = document.querySelector("#toast .ti");
+      document.getElementById("toast-msg").textContent = msg;
+      e.className = "show " + (ok !== false ? "ok" : "err");
+      if (i) i.textContent = ok !== false ? "✔" : "✖";
+      clearTimeout(_tt);
+      _tt = setTimeout(function () { e.className = ""; }, 3500);
+    }
+
+    window.onload = function () { init(); };
+  </script>
+</body>
+
+</html>
